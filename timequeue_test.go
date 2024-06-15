@@ -11,24 +11,20 @@ var (
 )
 
 func TestTimeQueue(t *testing.T) {
-	tq := New()
-	t.Log(tq)
+	tq := New[int]()
 
-	now := time.Now()
-
-	if err := tq.Enqueue(background, now); err != nil {
+	if _, err := tq.EnqueueValue(background, 2); err != nil {
 		t.Fatal(err)
 	}
-	if err := tq.Enqueue(background, now.Add(-1*time.Second)); err != nil {
+	if _, err := tq.EnqueueValue(background, 3); err != nil {
 		t.Fatal(err)
 	}
 
 	ctx, cancel := context.WithTimeout(background, time.Second)
 	defer cancel()
-	value, err := tq.Dequeue(ctx)
+	message, _, err := tq.Dequeue(ctx)
 	if err != nil {
-		t.Log(value, err)
+		t.Log(err)
 	}
-
-	t.Log(tq.messages)
+	t.Log("got value", message.Value)
 }
